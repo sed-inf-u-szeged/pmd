@@ -60,6 +60,9 @@
         <replace file="${target}/net/sourceforge/pmd/lang/ast/dummy/JavaCharStream.java"
                  token="class JavaCharStream"
                  value="class JavaCharStream implements CharStream" />
+        <replace file="${target}/net/sourceforge/pmd/lang/ast/dummy/JavaCharStream.java"
+                 token="protected int tabSize = 8;"
+                 value="protected int tabSize = 1;" />
         <move overwrite="true"
               file="${target}/net/sourceforge/pmd/lang/ast/dummy/JavaCharStream.java"
               tofile="${target}/net/sourceforge/pmd/lang/ast/JavaCharStream.java" />
@@ -78,6 +81,9 @@
         <replace file="${target}/net/sourceforge/pmd/lang/ast/dummy/SimpleCharStream.java"
                  token="public class SimpleCharStream"
                  value="public class SimpleCharStream implements CharStream" />
+        <replace file="${target}/net/sourceforge/pmd/lang/ast/dummy/SimpleCharStream.java"
+                 token="protected int tabSize = 8;"
+                 value="protected int tabSize = 1;" />
         <move overwrite="true"
               file="${target}/net/sourceforge/pmd/lang/ast/dummy/SimpleCharStream.java"
               tofile="${target}/net/sourceforge/pmd/lang/ast/SimpleCharStream.java" />

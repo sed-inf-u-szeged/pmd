@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sourceforge.pmd.lang.java.typeresolution.visitors.PMDASMVisitor;
 
@@ -29,6 +31,8 @@ import org.objectweb.asm.ClassReader;
  * then the resource foo/Bar.class will not exist, too.
  */
 public final class PMDASMClassLoader extends ClassLoader {
+    
+    private static final Logger LOG = Logger.getLogger(PMDASMClassLoader.class.getName()); 
     
     private static PMDASMClassLoader cachedPMDASMClassLoader;
     private static ClassLoader cachedClassLoader;
@@ -60,6 +64,12 @@ public final class PMDASMClassLoader extends ClassLoader {
 	}
 	try {
 	    return super.loadClass(name);
+	} catch (IncompatibleClassChangeError e) {
+	    dontBother.add(name);
+	    if (LOG.isLoggable(Level.FINE)) {
+	        LOG.log(Level.FINE, "Error at PMDASMClassLoader.loadClass(String) while trying to load " + name + ", due to: " + e.getClass().getName() + ": " + e.getMessage());
+	    }
+	    throw new ClassNotFoundException(name, e);
 	} catch (ClassNotFoundException e) {
 	    dontBother.add(name);
 	    throw e;

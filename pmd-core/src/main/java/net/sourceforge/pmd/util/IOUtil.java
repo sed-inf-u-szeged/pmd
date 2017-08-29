@@ -5,7 +5,8 @@ package net.sourceforge.pmd.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+//import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -26,7 +27,8 @@ public final class IOUtil {
 
     public static Writer createWriter(String reportFile) {
         try {
-            return StringUtil.isEmpty(reportFile) ? createWriter() : new BufferedWriter(new FileWriter(reportFile));
+            //return StringUtil.isEmpty(reportFile) ? createWriter() : new BufferedWriter(new FileWriter(reportFile));
+            return StringUtil.isEmpty(reportFile) ? createWriter() : new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile), "UTF-8"));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

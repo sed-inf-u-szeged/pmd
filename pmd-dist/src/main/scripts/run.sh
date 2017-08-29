@@ -2,7 +2,7 @@
 
 usage() {
     echo "Usage:"
-    echo "    $(basename $0) <application-name> [-h|-v] ..."
+    echo "    $(basename "$0") <application-name> [-h|-v] ..."
     echo ""
     echo "application-name: valid options are: $(valid_app_options)"
 	echo "-h print this help"
@@ -45,7 +45,7 @@ convert_cygwin_vars() {
 }
 
 java_heapsize_settings() {
-    local heapsize=${HEAPSIZE}
+    local heapsize="${HEAPSIZE}"
     case "${heapsize}" in
         [1-9]*[mgMG])
             readonly HEAPSIZE="-Xmx${heapsize}"
@@ -60,12 +60,12 @@ java_heapsize_settings() {
 
 
 set_lib_dir() {
-  if [ -z ${LIB_DIR} ]; then
-    local script_dir=$(dirname ${0})
+  if [ -z "${LIB_DIR}" ]; then
+    local script_dir="$(dirname "${0}")"
     local cwd="${PWD}"
 
     cd "${script_dir}/../lib"
-    readonly LIB_DIR=$(pwd -P)
+    readonly LIB_DIR="$(pwd -P)"
     cd "${cwd}"
   fi
 }
@@ -111,16 +111,16 @@ check_lib_dir
 
 convert_cygwin_vars
 
-classpath=$CLASSPATH
+classpath="$CLASSPATH"
 
 cd "${CWD}"
 
-for jarfile in ${LIB_DIR}/*.jar; do
-    classpath=$classpath:$jarfile
+for jarfile in "${LIB_DIR}"/*.jar; do
+    classpath="$classpath:$jarfile"
 done
 
 cygwin_paths
 
 java_heapsize_settings
 
-java ${HEAPSIZE} -cp "${classpath}" "${CLASSNAME}" ${@}
+java ${HEAPSIZE} -cp "${classpath}" "${CLASSNAME}" "${@}"

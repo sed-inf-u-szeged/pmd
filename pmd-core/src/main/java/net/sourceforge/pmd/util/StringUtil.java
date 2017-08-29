@@ -15,7 +15,8 @@ import java.util.List;
 public final class StringUtil {
 
 	public static final String[] EMPTY_STRINGS = new String[0];
-    private static final boolean SUPPORTS_UTF8 = System.getProperty("net.sourceforge.pmd.supportUTF8", "no").equals("yes");
+    //private static final boolean SUPPORTS_UTF8 = System.getProperty("net.sourceforge.pmd.supportUTF8", "no").equals("yes");
+    private static final boolean SUPPORTS_UTF8 = System.getProperty("net.sourceforge.pmd.supportUTF8", "yes").equals("yes");
 
     private StringUtil() {}
 
@@ -229,11 +230,17 @@ public final class StringUtil {
         for (int i = 0; i < src.length(); i++) {
             c = src.charAt(i);
             if (c > '~') {// 126
-                if (!supportUTF8) {
-                    buf.append("&#x").append(Integer.toHexString(c)).append(';');
+                // FIXME COLUMBUS HACK BEGIN
+                if (c != 0xffff && c != 0xfffe) {
+                    if (!supportUTF8) {
+                        buf.append("&#x").append(Integer.toHexString(c)).append(';');
+                    } else {
+                        buf.append(c);
+                    }
                 } else {
-                    buf.append(c);
+                    //skip character
                 }
+                // COLUMBUS HACK END
             } else if (c == '&') {
                 buf.append("&amp;");
             } else if (c == '"') {
@@ -242,6 +249,18 @@ public final class StringUtil {
                 buf.append("&lt;");
             } else if (c == '>') {
                 buf.append("&gt;");
+            // FIXME COLUMBUS HACK BEGIN
+            } else if (c < 0x20) {
+                if (c == '\t') {
+                    buf.append("&#x09;");
+                } else if (c == '\n') {
+                    buf.append("&#x0A;");
+                } else if (c == '\r') {
+                    buf.append("&#x0D;");
+                } else {
+                    // skip other control chars
+                }
+            // COLUMBUS HACK END
             } else {
                 buf.append(c);
             }

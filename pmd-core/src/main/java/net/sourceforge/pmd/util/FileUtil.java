@@ -3,7 +3,9 @@
  */
 package net.sourceforge.pmd.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,23 +75,46 @@ public final class FileUtil {
 	    throw new RuntimeException("File " + file.getName() + " doesn't exist");
 	}
 	if (!file.isDirectory()) {
-	    if (fileLocation.endsWith(".zip") || fileLocation.endsWith(".jar")) {
-		ZipFile zipFile;
-		try {
-		    zipFile = new ZipFile(fileLocation);
-		    Enumeration<? extends ZipEntry> e = zipFile.entries();
-		    while (e.hasMoreElements()) {
-			ZipEntry zipEntry = e.nextElement();
-			if (filenameFilter.accept(null, zipEntry.getName())) {
-			    dataSources.add(new ZipDataSource(zipFile, zipEntry));
+		if (fileLocation.endsWith(".zip") || fileLocation.endsWith(".jar")) {
+			ZipFile zipFile;
+			try {
+				zipFile = new ZipFile(fileLocation);
+				Enumeration<? extends ZipEntry> e = zipFile.entries();
+				while (e.hasMoreElements()) {
+					ZipEntry zipEntry = e.nextElement();
+					if (filenameFilter.accept(null, zipEntry.getName())) {
+						dataSources.add(new ZipDataSource(zipFile, zipEntry));
+					}
+			    }
+			} catch (IOException ze) {
+				throw new RuntimeException("Archive file " + file.getName() + " can't be opened");
 			}
-		    }
-		} catch (IOException ze) {
-		    throw new RuntimeException("Archive file " + file.getName() + " can't be opened");
+		} else if (fileLocation.endsWith(".lst")) {
+			File listFile = new File(fileLocation);
+			if (!listFile.exists()) {
+				throw new RuntimeException("List file " + listFile + " doesn't exist");
+			}
+			try {
+				BufferedReader reader = null;
+				try {
+					reader = new BufferedReader(new FileReader(listFile));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						line = line.trim();
+						if (line.length() > 0) {
+							collect(dataSources, line, filenameFilter);
+						}
+					}
+				} finally {
+					if (reader != null)
+						reader.close();
+				}
+			} catch (IOException e) {
+				throw new RuntimeException("IOException occurred while reading list file " + listFile, e);
+			}
+		} else {
+			dataSources.add(new FileDataSource(file));
 		}
-	    } else {
-		dataSources.add(new FileDataSource(file));
-	    }
 	} else {
 	    // Match files, or directories which are not excluded.
 	    // FUTURE Make the excluded directories be some configurable option
